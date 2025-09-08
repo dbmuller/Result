@@ -1,0 +1,15 @@
+﻿<Project Sdk="MSTest.Sdk/3.9.0">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseVSTest>true</UseVSTest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Result.Core\Result.Core.csproj" />
+  </ItemGroup>
+
+</Project>
