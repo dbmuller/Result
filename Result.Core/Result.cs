@@ -19,15 +19,18 @@ public sealed class Result
 
     public readonly List<ResultError> Errors = [];
 
-    public TReturn HandleResult<TReturn>(Func<TReturn> onSuccess, Func<Result, TReturn> onError)
+    public Result HandleResult(Func<Result> onSuccess, Func<Result, Result> onError)
+        => Success ? onSuccess() : onError(this);
+    
+    public Task<Result> HandleResultAsync(Func<Task<Result>> onSuccess, Func<Result, Task<Result>> onError)
         => Success ? onSuccess() : onError(this);
 
-    public static Result From<T>(Result<T> result)
-        => result.HandleReturnResult(onSuccess: _ => Result.Successful, onError: CreateError);
+    //public static Result From<T>(Result<T> result)
+    //    => result.HandleReturnResult(onSuccess: _ => Result.Successful, onError: CreateError);
+    //public static Result CreateError<T>(Result<T> result) => new(result.Errors);
 
-    public static Result Successful => new();
+    public static readonly Result Successful = new();
 
-    public static Result CreateError<T>(Result<T> result) => new(result.Errors);
     public static Result CreateError(IEnumerable<ResultError> error) => new(error);
     public static Result CreateError(IEnumerable<Result> result) => new(result.Errors);
     public static Result CreateError<T>(IEnumerable<Result<T>> result) => new(result.Errors);
@@ -55,14 +58,20 @@ public sealed class Result<T>
     public readonly List<ResultError> Errors = [];
 
     /// <summary>
-    /// To pass the result back down to handle further
+    /// Handle the result and pass the result back down to handle further
     /// </summary>
-    public TReturn HandleReturnResult<TReturn>(Func<T, TReturn> onSuccess, Func<Result<T>, TReturn> onError)
+    public Result<T> HandleReturnResult(Func<T, Result<T>> onSuccess, Func<Result<T>, Result<T>> onError)
         => Success ? onSuccess(_data) : onError(this);
 
-    public Task<TReturn> HandleReturnResultAsync<TReturn>(Func<T, Task<TReturn>> onSuccess, Func<Result<T>, Task<TReturn>> onError)
+    /// <summary>
+    /// Handle the result async and pass the result back down to handle further
+    /// </summary>
+    public Task<Result<T>> HandleReturnResultAsync(Func<T, Task<Result<T>>> onSuccess, Func<Result<T>, Task<Result<T>>> onError)
         => Success ? onSuccess(_data) : onError(this);
 
+    /// <summary>
+    /// No return, just handle the result
+    /// </summary>
     public void HandleResult(Action<T> onSuccess, Action<Result<T>> onError)
     {
         if (Success)
@@ -71,6 +80,9 @@ public sealed class Result<T>
             onError(this);
     }
 
+    /// <summary>
+    /// No return, just handle the result async
+    /// </summary>
     public Task HandleResultAsync(Func<T, Task> onSuccess, Func<Result<T>, Task> onError)
         => Success ? onSuccess(_data) : onError(this);
 
