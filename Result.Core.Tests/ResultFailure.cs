@@ -160,6 +160,4 @@ public sealed class ResultFailure
             return Result.CreateError([new ResultError(FailAddCode, FailMessageJustError)]);
         }
     }
-
 }
-
