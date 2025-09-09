@@ -68,13 +68,13 @@ public sealed class Result<T>
     /// <summary>
     /// Handle the result and pass the result back down to handle further
     /// </summary>
-    public Result<T> HandleReturnResult(Func<T, Result<T>> onSuccess, Func<Result<T>, Result<T>> onError)
+    public Result<TReturn> HandleReturnResult<TReturn>(Func<T, Result<TReturn>> onSuccess, Func<Result<T>, Result<TReturn>> onError)
         => Success ? onSuccess(_data) : onError(this);
 
     /// <summary>
     /// Handle the result async and pass the result back down to handle further
     /// </summary>
-    public Task<Result<T>> HandleReturnResultAsync(Func<T, Task<Result<T>>> onSuccess, Func<Result<T>, Task<Result<T>>> onError)
+    public Task<Result<TReturn>> HandleReturnResultAsync<TReturn>(Func<T, Task<Result<TReturn>>> onSuccess, Func<Result<T>, Task<Result<TReturn>>> onError)
         => Success ? onSuccess(_data) : onError(this);
 
     /// <summary>
