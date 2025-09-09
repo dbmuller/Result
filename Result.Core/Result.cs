@@ -15,6 +15,15 @@ public sealed class Result
         Errors.AddRange(error);
     }
 
+    /// <summary>
+    /// when copying a result, such as from Result<T>
+    /// </summary>
+    private Result(bool success, IEnumerable<ResultError> errors)
+    {
+        Success = success;
+        Errors.AddRange(errors);
+    }
+
     internal bool Success { get; }
 
     public readonly List<ResultError> Errors = [];
@@ -25,9 +34,8 @@ public sealed class Result
     public Task<Result> HandleResultAsync(Func<Task<Result>> onSuccess, Func<Result, Task<Result>> onError)
         => Success ? onSuccess() : onError(this);
 
-    //public static Result From<T>(Result<T> result)
-    //    => result.HandleReturnResult(onSuccess: _ => Result.Successful, onError: CreateError);
-    //public static Result CreateError<T>(Result<T> result) => new(result.Errors);
+    public static Result From<T>(Result<T> result)
+        => new(result.Success, result.Errors);
 
     public static readonly Result Successful = new();
 
