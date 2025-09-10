@@ -37,8 +37,13 @@ public sealed class Result
     public static Result From<T>(Result<T> result)
         => new(result.Success, result.Errors);
 
+    public static Task<Result> FromAsync<T>(Result<T> result)
+        => Task.FromResult<Result>(new(result.Success, result.Errors));
+
     public static readonly Result Successful = new();
 
+    // Coming from the generic version to return just fail
+    public static Result CreateError<T>(Result<T> error) => new(error.Errors);
     public static Result CreateError(IEnumerable<ResultError> error) => new(error);
     public static Result CreateError(IEnumerable<Result> result) => new(result.Errors);
     public static Result CreateError<T>(IEnumerable<Result<T>> result) => new(result.Errors);
@@ -71,6 +76,9 @@ public sealed class Result<T>
     public Result<TReturn> HandleReturnResult<TReturn>(Func<T, Result<TReturn>> onSuccess, Func<Result<T>, Result<TReturn>> onError)
         => Success ? onSuccess(_data) : onError(this);
 
+    public Result HandleReturnResult(Func<T, Result> onSuccess, Func<Result<T>, Result> onError)
+        => Success ? onSuccess(_data) : onError(this);
+
     /// <summary>
     /// Handle the result async and pass the result back down to handle further
     /// </summary>
@@ -82,9 +90,9 @@ public sealed class Result<T>
     /// </summary>
     public void HandleResult(Action<T> onSuccess, Action<Result<T>> onError)
     {
-        if (Success)
+        if (Success) 
             onSuccess(_data);
-        else
+        else 
             onError(this);
     }
 
@@ -97,7 +105,7 @@ public sealed class Result<T>
     public static Result<T> CreateSuccess(T value) => new(value);
     public static Result<T> CreateError(IEnumerable<ResultError> error) => new(error);
     public static Result<T> CreateError(Result<T> result) => new(result.Errors);
-
+    
     public static implicit operator Result<T>(T value) => CreateSuccess(value);
 }
 
